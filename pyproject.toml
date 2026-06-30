@@ -1,10 +1,10 @@
 [project]
 name = "asyncclick"
-description = "Composable command line interface toolkit"
+description = "Composable command line interface toolkit, async fork"
 readme = "README.md"
 license = "BSD-3-Clause"
 license-files = ["LICENSE.txt"]
-maintainers = [{name = "Pallets", email = "contact@palletsprojects.com"}]
+maintainers = [{name = "Matthias Urlichs", email = "matthias@urlichs.de"}]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
@@ -12,21 +12,19 @@ classifiers = [
     "Programming Language :: Python",
     "Typing :: Typed",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = [
     "colorama; platform_system == 'Windows'",
 ]
-version = "8.3.0.3"
+version = "8.4.2.1"
 
 [project.urls]
-Donate = "https://palletsprojects.com/donate"
-Documentation = "https://click.palletsprojects.com/"
-Changes = "https://click.palletsprojects.com/page/changes/"
-Source = "https://github.com/pallets/click/"
-Chat = "https://discord.gg/pallets"
+Source = "https://github.com/python-trio/asyncclick/"
 
 [dependency-groups]
 dev = [
+    "anyio",
+    "trio",
     "ruff",
     "tox",
     "tox-uv",
@@ -49,8 +47,14 @@ pre-commit = [
     "pre-commit-uv",
 ]
 tests = [
-    "anyio",
     "pytest",
+    "anyio",
+    "trio",
+]
+tests-random = [
+    "pytest",
+    "pytest-randomly",
+    "pytest-xdist",
 ]
 typing = [
     "anyio",
@@ -66,7 +70,7 @@ trio = [
 ]
 
 [build-system]
-requires = ["flit_core<4"]
+requires = ["flit_core>=3.11,<4"]
 build-backend = "flit_core.buildapi"
 
 [tool.flit.module]
@@ -91,6 +95,10 @@ testpaths = ["tests"]
 filterwarnings = [
     "error",
 ]
+markers = [
+    "stress: high-iteration stress tests for race conditions (deselect with '-m \"not stress\"')",
+]
+addopts = "-m 'not stress'"
 
 [tool.coverage.run]
 branch = true
@@ -107,7 +115,7 @@ exclude_also = [
 ]
 
 [tool.mypy]
-python_version = "3.10"
+python_version = "3.11"
 files = ["src", "tests/typing"]
 show_error_codes = true
 pretty = true
@@ -120,7 +128,7 @@ module = [
 ignore_missing_imports = true
 
 [tool.pyright]
-pythonVersion = "3.10"
+pythonVersion = "3.11"
 include = ["src", "tests/typing"]
 typeCheckingMode = "basic"
 
@@ -139,10 +147,12 @@ select = [
     "I",  # isort
     "UP",  # pyupgrade
     "W",  # pycodestyle warning
+    "ICN", #flake8-import-conventions (ICN)
 ]
-ignore = [
-    "UP038",  # keep isinstance tuple
-]
+
+[tool.ruff.lint.flake8-import-conventions.aliases]
+# Declare the default aliases.
+typing = "t"
 
 [tool.ruff.lint.isort]
 force-single-line = true
@@ -150,8 +160,10 @@ order-by-type = false
 
 [tool.tox]
 env_list = [
-    "py3.13", "py3.12", "py3.11", "py3.10",
+    "py3.14", "py3.13", "py3.12", "py3.11",
+    "py3.14t",
     "pypy3.11",
+    "stress-py3.14", "stress-py3.14t",
     "style",
     "typing",
     "docs",
@@ -170,6 +182,24 @@ commands = [[
     {replace = "posargs", default = [], extend = true},
 ]]
 
+[tool.tox.env.random]
+description = "randomized parallel tests to detect test pollution and race conditions"
+dependency_groups = ["tests-random"]
+commands = [[
+    "pytest", "-v", "--tb=short", "--numprocesses=auto",
+    "--basetemp={env_tmp_dir}",
+    {replace = "posargs", default = [], extend = true},
+]]
+
+[tool.tox.env.stress]
+description = "high-iteration stress tests for race conditions"
+commands = [[
+    "pytest", "-v", "--tb=short", "-x", "-m", "stress",
+    "--basetemp={env_tmp_dir}",
+    "--override-ini=addopts=",
+    {replace = "posargs", default = [], extend = true},
+]]
+
 [tool.tox.env.style]
 description = "run all pre-commit hooks on all files"
 dependency_groups = ["pre-commit"]
@@ -181,6 +211,7 @@ description = "run static type checkers"
 dependency_groups = ["typing"]
 commands = [
     ["mypy"],
+    ["pyright", "--ignoreexternal", "--verifytypes", "click"],
 ]
 
 [tool.tox.env.docs]

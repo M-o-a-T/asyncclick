@@ -1,3 +1,9 @@
+asyncclick (1:8.4.2.1-1) unstable; urgency=medium
+
+  * Merge
+
+ -- Matthias Urlichs <matthias@urlichs.de>  Tue, 30 Jun 2026 16:10:27 +0200
+
 asyncclick (1:8.3.0.3-1) unstable; urgency=medium
 
   * Stupid error
@@ -90,7 +96,7 @@ asyncclick (1:8.0.3-4) unstable; urgency=medium
 
 asyncclick (1:8.0.3-3) unstable; urgency=medium
 
-  * missed a comflict marker
+  * missed a conflict marker
 
  -- Matthias Urlichs <matthias@urlichs.de>  Wed, 05 Jan 2022 11:43:07 +0100
 

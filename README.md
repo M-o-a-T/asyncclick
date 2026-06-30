@@ -65,7 +65,7 @@ The :meth:`BaseCommand.__call__` alias now invokes the main entry point via
 `anyio.run`. If you already have an async main program, simply use
 ``await cmd.main()`` instead of ``cmd()``.
 
-:func:`asyncclick.prompt` is asyncronous and accepts a ``blocking`` parameter
+:func:`asyncclick.prompt` is asynchronous and accepts a ``blocking`` parameter
 that switches between "doesn't affect your event loop but has unwanted effects when
 interrupted" (bugfix pending) and "pauses your event loop but is safe to interrupt"
 with Control-C". The latter is the default until we fix that bug.
@@ -74,6 +74,12 @@ You cannot use Click and AsyncClick in the same program. This is not a problem
 in practice, as replacing ``import click`` with ``import asyncclick as click``, and
 ``from click import ...`` with ``from asyncclick import ...``, should be all that's
 required.
+
+### Notable packages supporting asyncclick
+
+* [OpenTelemetry][opentelemetry] supports instrumenting asyncclick.
+
+[opentelemetry]: https://pypi.org/project/opentelemetry-instrumentation-asyncclick/
 
 
 ## Donate

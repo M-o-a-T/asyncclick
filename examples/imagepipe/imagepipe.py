@@ -1,9 +1,10 @@
 from functools import update_wrapper
 
-import asyncclick as click
 from PIL import Image
 from PIL import ImageEnhance
 from PIL import ImageFilter
+
+import asyncclick as click
 
 
 @click.group(chain=True)
